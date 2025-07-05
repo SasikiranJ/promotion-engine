@@ -11,15 +11,17 @@ This application provides a REST API for calculating checkout totals with variou
 - **Bulk Promotions**: Buy X quantity of a SKU for a special price
 - **Combo Promotions**: Buy two specific SKUs together for a special price
 - **REST API**: Simple endpoints for checkout calculation and SKU information
-- **Validation**: Input validation for cart items
+- **Input Validation**: Comprehensive validation with custom error messages
+- **Error Handling**: Global exception handling with structured error responses
 - **Clean Architecture**: Separation of concerns with controllers, services, and models
+- **Comprehensive Testing**: Unit and integration tests with JUnit 5
 
 ## Technology Stack
 
 - **Java 17**
 - **Spring Boot 3.2.0**
 - **Maven**
-- **H2 Database** (for future persistence)
+- **Spring Validation** (for input validation)
 
 ## API Endpoints
 
@@ -62,6 +64,19 @@ POST /api/v1/checkout/calculate
 }
 ```
 
+**Error Response:**
+```json
+{
+  "error": "VALIDATION_ERROR",
+  "message": "Request validation failed",
+  "status": 400,
+  "timestamp": "2024-01-15T10:30:00",
+  "details": {
+    "cartItems[0].quantity": "Quantity must be at least 1"
+  }
+}
+```
+
 ### Get Available SKUs
 ```
 GET /api/v1/checkout/skus
@@ -95,6 +110,13 @@ GET /api/v1/checkout/skus
 ### Combo Promotions
 - **SKU C + SKU D**: Buy together for $30 (instead of $35)
 
+## Validation Rules
+
+- **SKU**: Required field, must be one of: A, B, C, D
+- **Quantity**: Must be at least 1
+- **Cart Items**: Maximum 100 items per cart
+- **Request Body**: Must be valid JSON with required fields
+
 ## Running the Application
 
 ### Prerequisites
@@ -112,14 +134,7 @@ mvn spring-boot:run
 
 The application will start on `http://localhost:8080`
 
-### Using Docker
-```bash
-# Build Docker image
-docker build -t promotion-engine .
 
-# Run container
-docker run -p 8080:8080 promotion-engine
-```
 
 ## Testing
 
@@ -138,12 +153,16 @@ mvn test
 
 ```
 src/main/java/com/promotion/
+├── config/
+│   └── PromotionConfig.java
 ├── controller/
 │   └── CheckoutController.java
 ├── dto/
 │   ├── CartItemDto.java
 │   ├── CheckoutRequest.java
 │   └── CheckoutResponse.java
+├── exception/
+│   └── GlobalExceptionHandler.java
 ├── model/
 │   ├── CartItem.java
 │   └── SKU.java
@@ -162,18 +181,20 @@ src/main/java/com/promotion/
 The application uses `application.yml` for configuration:
 
 - **Server Port**: 8080
-- **Actuator Endpoints**: Health and info endpoints available at `/actuator`
 - **Logging**: Configured for console and file output
+- **Validation**: Input validation with custom error messages
 
 ## Development
 
-The codebase follows a simple, clean architecture:
+The codebase follows a clean, layered architecture:
 
-- **Controllers**: Handle HTTP requests and responses
-- **Services**: Contain business logic
-- **Models**: Data structures
+- **Controllers**: Handle HTTP requests and responses with validation
+- **Services**: Contain business logic and promotion engine
+- **Models**: Data structures and domain objects
 - **DTOs**: Data transfer objects for API communication
 - **Promotions**: Extensible promotion rule implementations
+- **Exception Handling**: Global exception handler with structured error responses
+- **Configuration**: Spring configuration for promotion rules
 
 ## Extending the System
 

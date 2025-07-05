@@ -4,8 +4,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public class CartItem {
-    private Long id;
-    
     @NotNull(message = "SKU is required")
     private SKU sku;
     
@@ -19,13 +17,7 @@ public class CartItem {
         this.quantity = quantity;
     }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public SKU getSku() {
         return sku;
